@@ -1,0 +1,70 @@
+extends ./index
+
+block contenido
+    .flex.justify-end.mb-4
+        ul.flex.space-x-4
+            li
+                a(href="/estudiantes/creaEstudiantes" ) 
+                    img(src='/image/agregar-usuario.png' width="50px" height="50px" alt='Agregar')
+    .py-10
+        h1.text-4xl.my-10.font-extrabold.text-center Proyecto
+            span.font-normal Universidad
+        h2.text-center.text-2xl.font-extrabold= pagina
+
+        //form(action='/estudiantes/listarEstudiantes', method='get')
+            .flex
+                select(name="pestudiante_id" class="border rounded p-2 mr-4")
+                    option(value="") seleccione DNI
+                    each estudiante in estudiantes
+                        option(value=estudiante.id)= estudiante.dni
+                
+                select(name="profesor_id" class="border rounded p-2 mr-4")
+                    option(value="") seleccione estudiante
+                    each estudiante in estudiantes
+                        option(value=estudiante.id)= `${estudiante.nombre} ${estudiante.apellido}`
+
+                button(type="submit" class="bg-blue-500 text-white rounded p-2") Filtrar
+                
+        table.table-auto.w-full.mt-4
+            thead
+                tr
+                    th.text-left.text-gray-500.uppercase.px-6.py-3 Dni
+                    th.text-left.text-gray-500.uppercase.px-6.py-3 Nombre
+                    th.text-left.text-gray-500.uppercase.px-6.py-3 Apellido
+                    th.text-left.text-gray-500.uppercase.px-6.py-3 Email
+                    th.text-left.text-gray-500.uppercase.px-6.py-3 Acciones
+            tbody
+                each estudiante in estudiantes
+                    tr
+                        td.px-6.py-4= estudiante.dni
+                        td.px-6.py-4= estudiante.nombre
+                        td.px-6.py-4= estudiante.apellido
+                        td.px-6.py-4= estudiante.email
+                        td.px-6.py-4
+                            .flex.space-x-4
+                                a(href=`/estudiantes/modificaEstudiante/${estudiante.id}` class="editar") 
+                                    img(src='/image/boton-editar.png' width="30px" height="30px" alt='Editar')
+                                a(href="#", onclick=`eliminarEstudiante('${estudiante.id}')`) 
+                                    img(src='/image/eliminar.png' width="30px" height="30px" alt='Eliminar')
+    block scripts
+    script.
+        function eliminarEstudiante(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este estudiante?')) {
+                fetch(`/estudiantes/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.mensaje === 'Estudiante eliminado') {
+                        alert('Estudiante eliminado con éxito.');
+                        window.location.reload(); 
+                    } else {
+                        alert(data.mensaje); 
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el estudiante.');
+                });
+            }
+        }
